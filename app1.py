@@ -11,8 +11,8 @@ matplotlib.use('Agg')
 import seaborn as sns 
 
 def main():
-	""" Common ML Dataset Explorer """
-	st.title("Common ML Dataset Explorer")
+	""" Covid ML Dataset Explorer """
+	st.title("Covid ML Dataset Explorer")
 	st.subheader("Datasets For ML Explorer with Streamlit")
 
 	html_temp = """
@@ -30,54 +30,61 @@ def main():
 
 	# Read Data
 	df = pd.read_csv(filename)
+	confirmed = df.drop(['Province/State', 'Lat','Long'], axis=1)
+	confirmed=confirmed.rename_axis(None, axis=1).rename_axis('Date', axis=0)
+	confirmed['Total']= confirmed.sum(axis=1)
+	
+	
 	# Show Dataset
 
 	if st.checkbox("Show Dataset"):
 		
-		st.dataframe(df)
+		st.dataframe(confirmed)
 
 	# Show Columns
 	if st.button("Column Names"):
-		st.write(df.columns)
+		st.write(confirmed.columns)
 
 	# Show Shape
 	if st.checkbox("Shape of Dataset"):
 		data_dim = st.radio("Show Dimension By ",("Rows","Columns"))
 		if data_dim == 'Rows':
 			st.text("Number of Rows")
-			st.write(df.shape[0])
+			st.write(confirmed.shape[0])
 		elif data_dim == 'Columns':
 			st.text("Number of Columns")
-			st.write(df.shape[1])
+			st.write(confirmed.shape[1])
 		else:
-			st.write(df.shape)
+			st.write(confirmed.shape)
 
 	# Select Columns
 	if st.checkbox("Select Columns To Show"):
-		all_columns = df.columns.tolist()
+		all_columns = confirmed.columns.tolist()
 		selected_columns = st.multiselect("Select",all_columns)
-		new_df = df[selected_columns]
+		new_df = confirmed[selected_columns]
 		st.dataframe(new_df)
 	
 	# Show Values
 	if st.button("Value Counts"):
 		st.text("Value Counts By Target/Class")
-		st.write(df.iloc[:,-1].value_counts())
+		st.write(confirmed.iloc[:,-1].value_counts())
 
 
 	# Show Datatypes
 	if st.button("Data Types"):
-		st.write(df.dtypes)
+		st.write(confirmed.dtypes)
 
 
 
 	# Show Summary
 	if st.checkbox("Summary"):
-		st.write(df.describe().T)
+		st.write(confirmed.describe().T)
 		
 	# EDA
+	
+     
 	if st.checkbox("Total cases"):
-		st.write(df)
+	    st.write(confirmed['Total'])
 	## Plot and Visualization
 
 	st.subheader("Data Visualization")
@@ -94,6 +101,8 @@ def main():
 		if st.button("Generate Pie Plot"):
 			st.success("Generating A Pie Plot")
 			st.write(df.iloc[:,-1].value_counts().plot.pie(autopct="%1.1f%%"))
+			fig,ax = plt.subplot
+			ax.scatter(df['Total'],df['Date'])
 			st.pyplot()
 
 	# Count Plot
@@ -151,9 +160,9 @@ def main():
 	st.sidebar.markdown("[Common ML Dataset Repo]("")")
 
 	st.sidebar.header("About")
-	st.sidebar.info("Jesus Saves@JCharisTech")
+	st.sidebar.info("nitin.faye@gmail.com")
 	st.sidebar.text("Built with Streamlit")
-	st.sidebar.text("Maintained by Jesse JCharis")
+	st.sidebar.text("Maintained by Nitin Faye")
 
 
 if __name__ == '__main__':
